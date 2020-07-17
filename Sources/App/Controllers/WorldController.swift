@@ -7,7 +7,10 @@ struct WorldController: RouteCollection {
         let worlds = routes.grouped("world")
         worlds.get(use: index)
         worlds.post(use: create)
-        worlds.group(":worldID") { world in
+        worlds.group(":worldID") { world in            
+            // posting raw data
+            world.on(.POST, body: .collect(maxSize: 100_000_000), use: saveData)
+            world.get(use: fetchSingle)
             let anchors = world.grouped("anchor")
             anchors.post(use: anchorController.create)
             world.delete(use: delete)
@@ -19,8 +22,14 @@ struct WorldController: RouteCollection {
     }
 
     func create(req: Request) throws -> EventLoopFuture<World> {
-        let world = try req.content.decode(World.self)
+        let clientWorld = try req.content.decode(ClientWorld.self)
+        let world =  clientWorld.world()
         return world.save(on: req.db).map { world }
+    }
+
+    func fetchSingle(req: Request) throws -> EventLoopFuture<World> {
+        return World.find(req.parameters.get("worldID"), on: req.db)
+            .unwrap(or: Abort(.notFound))
     }
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
@@ -28,5 +37,9 @@ struct WorldController: RouteCollection {
             .unwrap(or: Abort(.notFound))
             .flatMap { $0.delete(on: req.db) }
             .transform(to: .ok)
+    }
+
+    func saveData(_ req: Request) throws -> EventLoopFuture<Anchor> {
+        return try anchorController.create(req: req)
     }
 }

@@ -1,6 +1,12 @@
 import Fluent
 import Vapor
 
+struct ClientWorld: Content {
+    var title: String
+    func world() -> World {
+        return World(title: title)
+    }
+}
 final class World: Model, Content {
     static let schema = "world"
     
@@ -10,17 +16,16 @@ final class World: Model, Content {
     @Field(key: "title")
     var title: String
 
-    @Field(key: "data")
-    var data: String
+    @OptionalField(key: "data")
+    var data: Data?
 
     @Children(for: \.$world)
     var anchors: [Anchor]
 
     init() { }
 
-    init(id: UUID? = nil, title: String, data: String) {
+    init(id: UUID? = nil, title: String) {
         self.id = id
         self.title = title
-        self.data = data
     }
 }

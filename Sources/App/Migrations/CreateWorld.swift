@@ -5,7 +5,7 @@ struct CreateWorld: Migration {
         return database.schema(World.schema)
             .id()
             .field("title", .string, .required)
-            .field("data", .string, .required)
+            .field("data", .data)
             .create()
     }
 

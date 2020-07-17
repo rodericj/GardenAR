@@ -5,7 +5,7 @@ struct CreateAnchor: Migration {
         return database.schema(Anchor.schema)
             .id()
             .field("title", .string, .required)
-            .field("world_id", .uuid, .required, .references("world", "id"))
+            .field("world_id", .uuid, .required, .references("world", "id", onDelete: .cascade))
             .create()
     }
 

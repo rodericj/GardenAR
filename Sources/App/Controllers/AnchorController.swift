@@ -1,9 +1,11 @@
 import Fluent
 import Vapor
 
-struct NewAnchor: Content {
-    let title: String
+struct AnchorDataPayload: Content {
+    var anchorName: String
+    var data: Data
 }
+
 enum AnchorError: Error {
     case worldNotFound
 }
@@ -25,12 +27,15 @@ struct AnchorController: RouteCollection {
 
     func create(req: Request) throws -> EventLoopFuture<Anchor> {
 
-        let anchor = try req.content.decode(NewAnchor.self)
+        let anchor = try req.content.decode(AnchorDataPayload.self)
+        
         return World.find(req.parameters.get("worldID"), on: req.db)
             .unwrap(or: AnchorError.worldNotFound)
             .flatMap { world in
-                let newAnchor = Anchor(title: anchor.title)
-                return world.$anchors.create(newAnchor, on: req.db).map { newAnchor }
+                world.data = anchor.data
+                let newAnchor = Anchor(title: anchor.anchorName)
+                let createAnchor = world.$anchors.create(newAnchor, on: req.db)
+                return world.save(on: req.db).and(createAnchor).map { _ in newAnchor }
         }
     }
 

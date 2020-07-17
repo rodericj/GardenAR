@@ -12,7 +12,7 @@ struct CreateAnchorMetadata: Migration {
                     .id()
                     .field("text", .string, .required)
                     .field("type", metadataEnum, .required)
-                    .field("anchor_id", .uuid, .required, .references("anchor", "id"))
+                    .field("anchor_id", .uuid, .required, .references("anchor", "id", onDelete: .cascade))
                     .create()
         }
     }
