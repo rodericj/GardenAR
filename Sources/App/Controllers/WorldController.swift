@@ -18,7 +18,8 @@ struct WorldController: RouteCollection {
     }
 
     func index(req: Request) throws -> EventLoopFuture<[World]> {
-        return World.query(on: req.db).all()
+        let allWorlds = World.query(on: req.db).with(\.$anchors).all()
+        return allWorlds
     }
 
     func create(req: Request) throws -> EventLoopFuture<World> {
