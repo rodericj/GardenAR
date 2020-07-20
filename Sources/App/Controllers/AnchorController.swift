@@ -4,6 +4,7 @@ import Vapor
 struct AnchorDataPayload: Content {
     var anchorName: String
     var data: Data
+    var id: UUID
 }
 
 enum AnchorError: Error {
@@ -28,12 +29,12 @@ struct AnchorController: RouteCollection {
     func create(req: Request) throws -> EventLoopFuture<Anchor> {
 
         let anchor = try req.content.decode(AnchorDataPayload.self)
-        
+        print("We got a new anchor in the anchor controller. It's UUID = \(anchor.id)")
         return World.find(req.parameters.get("worldID"), on: req.db)
             .unwrap(or: AnchorError.worldNotFound)
             .flatMap { world in
                 world.data = anchor.data
-                let newAnchor = Anchor(title: anchor.anchorName)
+                let newAnchor = Anchor(id: anchor.id, title: anchor.anchorName)
                 let createAnchor = world.$anchors.create(newAnchor, on: req.db)
                 return world.save(on: req.db).and(createAnchor).map { _ in newAnchor }
         }
