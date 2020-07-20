@@ -17,8 +17,10 @@ struct WorldController: RouteCollection {
         }
     }
 
-    func index(req: Request) throws -> EventLoopFuture<[World]> {
-        let allWorlds = World.query(on: req.db).with(\.$anchors).all()
+    func index(req: Request) throws -> EventLoopFuture<[LiteWorld]> {
+        let allWorlds = World.query(on: req.db).with(\.$anchors).all().flatMapThrowing { worlds in
+            try worlds.map { try LiteWorld(world: $0) }
+        }
         return allWorlds
     }
 

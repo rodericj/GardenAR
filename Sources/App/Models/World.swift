@@ -7,6 +7,16 @@ struct ClientWorld: Content {
         return World(title: title)
     }
 }
+struct LiteWorld: Content {
+    var title: String
+    var id: UUID
+    var anchors: [Anchor]
+    init(world: World) throws {
+        title = world.title
+        try id = world.requireID()
+        anchors = world.anchors
+    }
+}
 final class World: Model, Content {
     static let schema = "world"
     
