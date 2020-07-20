@@ -14,7 +14,7 @@ public func configure(_ app: Application) throws {
         database: Environment.get("DATABASE_NAME") ?? "gardenar"
     ), as: .psql)
 
-    app.migrations.add(CreateWorld())
+    app.migrations.add(CreateSpace())
     app.migrations.add(CreateAnchor())
     app.migrations.add(CreateAnchorMetadata())
     try app.autoMigrate().wait()

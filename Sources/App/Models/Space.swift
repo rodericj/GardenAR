@@ -1,24 +1,24 @@
 import Fluent
 import Vapor
 
-struct ClientWorld: Content {
+struct ClientSpace: Content {
     var title: String
-    func world() -> World {
-        return World(title: title)
+    func space() -> Space {
+        return Space(title: title)
     }
 }
-struct LiteWorld: Content {
+struct LiteSpace: Content {
     var title: String
     var id: UUID
     var anchors: [Anchor]
-    init(world: World) throws {
-        title = world.title
-        try id = world.requireID()
-        anchors = world.anchors
+    init(space: Space) throws {
+        title = space.title
+        try id = space.requireID()
+        anchors = space.anchors
     }
 }
-final class World: Model, Content {
-    static let schema = "world"
+final class Space: Model, Content {
+    static let schema = "space"
     
     @ID(key: .id)
     var id: UUID?
@@ -29,7 +29,7 @@ final class World: Model, Content {
     @OptionalField(key: "data")
     var data: Data?
 
-    @Children(for: \.$world)
+    @Children(for: \.$space)
     var anchors: [Anchor]
 
     init() { }

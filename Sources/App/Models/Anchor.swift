@@ -10,8 +10,8 @@ final class Anchor: Model, Content {
     @Field(key: "title")
     var title: String
 
-    @Parent(key: "world_id")
-    var world: World
+    @Parent(key: "space_id")
+    var space: Space
 
     @Children(for: \.$anchor)
     var metadata: [AnchorMetadata]

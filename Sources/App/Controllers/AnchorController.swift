@@ -8,7 +8,7 @@ struct AnchorDataPayload: Content {
 }
 
 enum AnchorError: Error {
-    case worldNotFound
+    case spaceNotFound
 }
 struct AnchorController: RouteCollection {
     let metadataController = MetadataController()
@@ -30,18 +30,18 @@ struct AnchorController: RouteCollection {
 
         let anchor = try req.content.decode(AnchorDataPayload.self)
         print("We got a new anchor in the anchor controller. It's UUID = \(anchor.id)")
-        return World.find(req.parameters.get("worldID"), on: req.db)
-            .unwrap(or: AnchorError.worldNotFound)
-            .flatMap { world in
-                world.data = anchor.data
+        return Space.find(req.parameters.get("spaceID"), on: req.db)
+            .unwrap(or: AnchorError.spaceNotFound)
+            .flatMap { space in
+                space.data = anchor.data
                 let newAnchor = Anchor(id: anchor.id, title: anchor.anchorName)
-                let createAnchor = world.$anchors.create(newAnchor, on: req.db)
-                return world.save(on: req.db).and(createAnchor).map { _ in newAnchor }
+                let createAnchor = space.$anchors.create(newAnchor, on: req.db)
+                return space.save(on: req.db).and(createAnchor).map { _ in newAnchor }
         }
     }
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        return Anchor.find(req.parameters.get("worldID"), on: req.db)
+        return Anchor.find(req.parameters.get("spaceID"), on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { $0.delete(on: req.db) }
             .transform(to: .ok)

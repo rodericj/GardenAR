@@ -1,8 +1,8 @@
 import Fluent
 
-struct CreateWorld: Migration {
+struct CreateSpace: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
-        return database.schema(World.schema)
+        return database.schema(Space.schema)
             .id()
             .field("title", .string, .required)
             .field("data", .data)
@@ -10,6 +10,6 @@ struct CreateWorld: Migration {
     }
 
     func revert(on database: Database) -> EventLoopFuture<Void> {
-        return database.schema(World.schema).delete()
+        return database.schema(Space.schema).delete()
     }
 }
